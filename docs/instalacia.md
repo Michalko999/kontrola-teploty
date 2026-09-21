@@ -25,7 +25,7 @@ generátor Jekyll a časť súborov by nenasadil.
 
 ## Možnosť B — z vlastnej siete (funguje aj so senzormi)
 
-Na počítači, NAS alebo Raspberry v domácej sieti:
+Na počítači, ktorý je zapnutý a pripojený do domácej siete:
 
 ```bash
 git clone <adresa-repozitára>
@@ -35,8 +35,9 @@ node server.js
 
 Vypíše adresy typu `http://192.168.1.10:8080`. Tú otvor na telefóne.
 
-Na Synology NAS sa dá priečinok nakopírovať do Web Station, alebo spustiť
-`server.js` cez Node.js balíček a Naplánované úlohy (pri štarte).
+Nevýhoda je, že počítač musí byť zapnutý. Keď raz doma pobeží Home Assistant,
+bude to elegantnejšie: appka sa dá nakopírovať priamo do jeho priečinka
+`config/www` a `server.js` netreba vôbec. Pozri `docs/poznamky-home-assistant.md`.
 
 ## Možnosť C — lokálne na počítači
 

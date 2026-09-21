@@ -65,6 +65,7 @@ Na telefón cez GitHub Pages alebo z domácej siete — podrobne v
 - **[Teória](docs/ekvitermika-teoria.md)** — vzorce, tlmenie, kondenzácia, ako funguje učenie
 - **[WiFi senzory](docs/wifi-senzory.md)** — čo kúpiť, ako zapojiť, obmedzenia prehliadača
 - **[Inštalácia](docs/instalacia.md)** — PWA na plochu, hosting, zálohy
+- **[Poznámky: Home Assistant](docs/poznamky-home-assistant.md)** — odložený plán: čo kúpiť, prečo, a čo sa tým v appke doplní
 
 ## Technicky
 

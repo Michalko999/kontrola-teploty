@@ -15,7 +15,8 @@ z nameraných teplôt.
 
 ### 2. Zigbee čidlá + Home Assistant — najlacnejšie na kus
 - čidlá Aqara / Sonoff stoja pár eur
-- treba Home Assistant (Raspberry, NAS, mini PC) a Zigbee kľúč
+- treba krabičku, čo beží nonstop, s Home Assistantom, a Zigbee kľúč
+  (čo presne kúpiť je v `docs/poznamky-home-assistant.md`)
 - v appke: typ *Home Assistant*, zadáš adresu, token a entitu
 - dáva zmysel, ak plánuješ aj ďalšie smart veci
 
@@ -45,7 +46,9 @@ Riešenia, od najjednoduchšieho:
    ```
    Vypíše adresy typu `http://192.168.1.10:8080`. Tú otvor na telefóne
    (musíš byť na rovnakej WiFi) a pridaj na plochu. Senzory v LAN budú fungovať.
-   Server sa dá nechať trvalo bežať na NAS, Raspberry alebo mini PC.
+   Nevýhoda: počítač musí byť zapnutý. Trvalé riešenie je malá krabička,
+   čo beží nonstop — a keď na nej pobeží Home Assistant, appka môže bývať
+   priamo v ňom (`config/www`) a `server.js` netreba vôbec.
 
 2. **Home Assistant s HTTPS** — ak má HA platný certifikát a povolené CORS,
    appka ho vie čítať aj z https stránky.
