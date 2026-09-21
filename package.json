@@ -1,0 +1,12 @@
+{
+  "name": "ekvitermika",
+  "version": "1.0.0",
+  "description": "Mobilna PWA na nastavenie ekvitermickej krivky podla vonkajsej teploty bez vonkajsieho cidla (Immergas Victrix Tera 28 1)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "MIT",
+  "private": true
+}

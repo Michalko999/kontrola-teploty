@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Ekvitermika">
+  <rect width="512" height="512" rx="112" fill="#0f1720"/>
+  <path d="M96 352 C 160 352, 190 300, 236 236 C 282 172, 330 140, 416 140"
+        fill="none" stroke="#ff8a3d" stroke-width="26" stroke-linecap="round"/>
+  <g fill="none" stroke="#4aa8ff" stroke-width="16" stroke-linecap="round">
+    <path d="M96 400 H 416"/>
+  </g>
+  <circle cx="236" cy="236" r="26" fill="#ff8a3d"/>
+  <g fill="#e8eef5">
+    <rect x="132" y="120" width="22" height="120" rx="11"/>
+    <circle cx="143" cy="262" r="34"/>
+  </g>
+  <rect x="137" y="160" width="12" height="108" rx="6" fill="#ff8a3d"/>
+  <circle cx="143" cy="262" r="20" fill="#ff8a3d"/>
+</svg>
