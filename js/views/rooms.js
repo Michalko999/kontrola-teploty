@@ -163,7 +163,8 @@ export function floorPlan(onPick, selected) {
     for (const [k, v] of Object.entries(a)) e.setAttribute(k, String(v));
     return e;
   };
-  const svg = mk('svg', { viewBox: '0 0 300 262', class: 'plan', role: 'img', 'aria-label': 'Pôdorys bytu' });
+  const svg = mk('svg', { viewBox: '0 0 300 292', class: 'plan', role: 'img',
+    'aria-label': 'Pôdorys bytu, pravý horný roh smeruje na sever' });
 
   const rooms = [
     { id: 'C', x: 20,  y: 20,  w: 130, h: 110 },
@@ -216,6 +217,14 @@ export function floorPlan(onPick, selected) {
   const tl = mk('text', { x: 134, y: 152, class: 'plan-note thermo', 'text-anchor': 'end' });
   tl.textContent = 'termostat';
   svg.appendChild(tl);
+
+  // Sever. Byt je natoceny o 45°: pravy horny roh podorysu (izba B) je presne
+  // sever, takze sipka mieri sikmo hore doprava a nie kolmo hore.
+  svg.appendChild(mk('line', { x1: 28, y1: 284, x2: 54, y2: 258, class: 'plan-compass' }));
+  svg.appendChild(mk('polygon', { points: '60,252 56,265 47,256', class: 'plan-compass-tip' }));
+  const nl = mk('text', { x: 68, y: 258, class: 'plan-note compass' });
+  nl.textContent = 'sever';
+  svg.appendChild(nl);
 
   return svg;
 }

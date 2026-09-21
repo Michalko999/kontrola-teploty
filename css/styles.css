@@ -218,6 +218,9 @@ td { padding: 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
 .plan-note { fill: var(--text-dim); font-size: 7.5px; }
 .plan-note.thermo { fill: var(--danger); }
 .plan-thermo { fill: var(--danger); }
+.plan-compass { stroke: var(--text-dim); stroke-width: 1.5; stroke-linecap: round; }
+.plan-compass-tip { fill: var(--text-dim); }
+.plan-note.compass { font-size: 9px; font-weight: 600; fill: var(--text-dim); }
 
 /* ---- izby ------------------------------------------------------------------ */
 .rooms-list { display: flex; flex-direction: column; gap: 8px; }

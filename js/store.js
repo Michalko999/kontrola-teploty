@@ -4,7 +4,10 @@
  * (okrem volania predpovede pocasia a pripadnych WiFi senzorov, ktore si nastavis sam).
  */
 
-const KEY = 'ekvitermika.v1';
+/** Ulozisko. Verziu zvysujeme, ked sa zmenia vychodzie hodnoty tak, ze by ich
+ *  stare ulozene nastavenie prekrylo (napr. pole izieb sa pri zlucovani nahradza
+ *  cele). Stary kluc sa necha lezat, aby sa dalo v konzole dostat k povodnym datam. */
+const KEY = 'ekvitermika.v2';
 
 /** Vychodzie nastavenie postavene na podklade od uzivatela: byt 4 izby + chodba,
  *  Immergas Victrix Tera 28 1, termostat na stene obyvacky (izba D). */
@@ -29,23 +32,33 @@ export const DEFAULTS = {
   },
 
   building: {
-    label: 'Byt',
+    label: 'Byt 75 m², 1985, nezateplený',
     type: 'panelak',          // panelak | tehla | novostavba
-    tOutDesign: -11,          // vypoctova vonkajsia teplota (SK nizina -11, vyssie polohy -13/-15)
-    tIndoorDesign: 20,
-    heatLossKw: 5.0,          // odhad tepelnej straty bytu pri navrhovom stave
-    massHours: 12,            // tepelna zotrvacnost pre tlmenie vonkajsej teploty
+    area: 75,
+    // Dolna Krupa, okres Trnava, 192 m n. m. — nizina, preto -11 °C.
+    tOutDesign: -11,
+    tIndoorDesign: 22,        // zhodne s cielom referencnej izby D
+    heatLossKw: 6.0,          // 75 m^2, nezateplena stavba z r. 1985, rohovy byt
+    massHours: 15,            // 30 cm murivo bez zateplenia drzi teplo dlho
     heatingLimit: 16,         // nad touto vonkajsou teplotou kurenie vypnut
-    location: { name: '', lat: null, lon: null },
+    /** Orientacia: pravy horny roh podorysu (izba B) smeruje presne na SEVER.
+     *  Byt je teda natoceny o 45° — horna hrana podorysu smeruje na SZ,
+     *  prava na SV, spodna na JV a lava na JZ. */
+    northCornerRoom: 'B',
+    location: { name: 'Dolná Krupá', lat: 48.48266, lon: 17.55112 },
   },
 
   curve: {
-    tFlowDesign: 55,          // teplota privodu pri -11 °C
-    tReturnDesign: 45,
+    /** Teplota privodu pri -11 °C. Stavba z r. 1985 bez zateplenia ma povodne
+     *  clankove radiatory dimenzovane na vysoke teploty — pri 55 °C by dodali
+     *  len zlomok menoviteho vykonu. Zaciname vyssie a v priebehu sezony
+     *  znizujeme; 50 °C na spiatocke stale kondenzuje. */
+    tFlowDesign: 65,
+    tReturnDesign: 50,
     exponent: 1.3,            // doskove/clankove radiatory
     shift: 0,                 // paralelny posun (rucny alebo z ucenia)
     tFlowMin: 28,
-    tFlowMax: 70,
+    tFlowMax: 75,          // rezerva nad 65 °C, kotol dovoli az 85 °C
     nightShift: -4,           // nocny utlm (K)
     nightFrom: '22:00',
     nightTo: '05:30',
@@ -66,23 +79,27 @@ export const DEFAULTS = {
     setpointNight: 19.0,
   },
 
-  /** Izby podla nakresu:
-   *  A kuchyna (radiator vychod, balkonove dvere), B spalna (radiator vychod),
-   *  C detska (radiator zapad), D obyvacka (radiator zapad, balkonove dvere),
+  /** Izby podla nakresu. Svetove strany vychadzaju z toho, ze pravy horny roh
+   *  podorysu (izba B) je presne sever — byt je natoceny o 45°.
+   *  A kuchyna (SV stena, balkon na JV), B spalna (SZ + SV = severny roh),
+   *  C detska (SZ + JZ), D obyvacka (JZ + balkon na JV = juzny roh),
    *  CHODBA bez radiatora. */
   rooms: [
     { id: 'A', name: 'Kuchyňa',  target: 21.0, hasTrv: true,  hasRadiator: true,
-      wall: 'východ', extDoor: 'balkónové dvere', sensorId: null,
-      note: 'Kuchyňa má tepelné zisky od varenia — hlavicu stačí nižšie.' },
-    { id: 'B', name: 'Spálňa',   target: 19.0, hasTrv: true,  hasRadiator: true,
-      wall: 'východ', extDoor: null, sensorId: null,
-      note: 'V spálni je príjemnejšie chladnejšie, 18–19 °C.' },
+      wall: 'severovýchod', extDoor: 'balkónové dvere na juhovýchod', sensorId: null,
+      note: 'Ráno ju prisvieti slnko od juhovýchodu a má zisky od varenia — hlavicu stačí nižšie.' },
+    { id: 'B', name: 'Spálňa',   target: 20.0, hasTrv: true,  hasRadiator: true,
+      wall: 'severovýchod', extDoor: null, sensorId: null,
+      note: 'Severný roh bytu — dve vonkajšie steny a v zime prakticky žiadne slnko. '
+          + 'Najchladnejšia izba v byte, hlavicu tu daj najvyššie.' },
     { id: 'C', name: 'Detská',   target: 21.5, hasTrv: true,  hasRadiator: true,
-      wall: 'západ', extDoor: null, sensorId: null,
-      note: 'Najteplejšia izba, hlavica najvyššie.' },
+      wall: 'juhozápad', extDoor: null, sensorId: null,
+      note: 'Poobede ju prehreje slnko od juhozápadu, ráno býva chladnejšia.' },
     { id: 'D', name: 'Obývačka', target: 22.0, hasTrv: true,  hasRadiator: true,
-      wall: 'západ', extDoor: 'balkónové dvere', sensorId: null,
-      note: 'Referenčná izba — je tu termostat, preto hlavicu nechaj naplno otvorenú.' },
+      wall: 'juhozápad', extDoor: 'balkónové dvere na juhovýchod', sensorId: null,
+      note: 'Referenčná izba — je tu termostat, preto hlavicu nechaj naplno otvorenú. '
+          + 'Pozor: je to južný roh, cez deň ju prehrieva slnko a termostat potom '
+          + 'zastaví kotol, aj keď je v spálni ešte chladno.' },
     { id: 'H', name: 'Chodba',   target: 20.0, hasTrv: false, hasRadiator: false,
       wall: null, extDoor: 'vchodové dvere', sensorId: null,
       note: 'Bez radiátora — vykuruje sa otvorenými dverami z izieb.' },

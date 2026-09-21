@@ -16,9 +16,10 @@ Kotol má jednu hodnotu, ktorá rozhoduje o komforte aj o účte za plyn:
 - Nastavená **akurát** → radiátory sú vlažné a hrejú takmer nepretržite. Teplota v izbe
   stojí ako zapichnutá, kotol modeluje výkon a kondenzuje.
 
-Správna hodnota **nie je jedno číslo** — mení sa s počasím. Keď je vonku +8 °C, stačí
-okolo 35 °C. Keď je −10 °C, treba okolo 55 °C. Tomuto vzťahu sa hovorí **ekvitermická
-krivka** a normálne ju počíta kotol z vonkajšieho čidla.
+Správna hodnota **nie je jedno číslo** — mení sa s počasím. Pri nastavení, ktoré máš
+v appke, to vychádza takto: keď je vonku +8 °C, stačí okolo 43 °C, a keď je −10 °C,
+treba okolo 64 °C. Tomuto vzťahu sa hovorí **ekvitermická krivka** a normálne ju
+počíta kotol z vonkajšieho čidla.
 
 **Ty čidlo nemáš** — takže ho nahrádza aplikácia: vezme vonkajšiu teplotu z predpovede
 pre tvoju obec a povie ti číslo, ktoré máš navoliť na kotli.
@@ -27,11 +28,11 @@ pre tvoju obec a povie ti číslo, ktoré máš navoliť na kotli.
 
 ## 2. Prvé spustenie (10 minút)
 
-1. **Nastavenia → Poloha**: nájdi svoju obec. Bez toho appka nevie, aká je vonku teplota.
-2. **Nastavenia → Budova**: typ stavby a výpočtová vonkajšia teplota
-   (na Slovensku zvyčajne −11 °C, vo vyšších polohách −13 až −15 °C).
+1. **Nastavenia → Poloha**: predvyplnená je Dolná Krupá. Meniť netreba.
+2. **Nastavenia → Budova**: predvyplnené je 75 m², nezateplená stavba z r. 1985
+   a výpočtová vonkajšia teplota −11 °C (Dolná Krupá leží v nížine, 192 m n. m.).
 3. **Izby**: skontroluj požadované teploty. Predvyplnené je
-   kuchyňa 21 °C, spálňa 19 °C, detská 21,5 °C, obývačka 22 °C.
+   kuchyňa 21 °C, spálňa 20 °C, detská 21,5 °C, obývačka 22 °C.
 4. **Kotol**: zapíš, akú teplotu vykurovacej vody máš na kotli teraz.
 5. **Prehľad**: appka ukáže odporúčanú hodnotu. Nastav ju na kotli a ťukni
    „Nastavil som …“.
@@ -60,6 +61,35 @@ Prakticky to znamená:
 4. **Ostatné izby si riadia hlavice.** Obývačka určuje, kedy kotol kúri; kuchyňa,
    spálňa a detská si z toho tepla uberú toľko, koľko im dovolí ich hlavica.
 
+### Orientácia bytu — a prečo na tom záleží
+
+Pravý horný roh pôdorysu (spálňa, izba B) smeruje **presne na sever**. Byt je teda
+natočený o 45° a svetové strany vychádzajú takto:
+
+| Izba | Vonkajšie steny | Slnko |
+|---|---|---|
+| **B — spálňa** | severozápad + **severovýchod** | **severný roh, v zime prakticky žiadne** |
+| C — detská | severozápad + juhozápad | poobede |
+| A — kuchyňa | severovýchod + juhovýchod (balkón) | ráno |
+| **D — obývačka** | juhozápad + juhovýchod (balkón) | **južný roh, cez deň najviac zo všetkých** |
+
+Z toho plynú dve veci, ktoré ti reálne skomplikujú kúrenie:
+
+**Spálňa je najchladnejšia izba v byte.** Má dve vonkajšie steny, je to severný roh
+a nedostane ani lúč slnka. Ak niekde nebude dosť teplo, bude to tam — preto jej
+hlavicu nastav vyššie než by si podľa teploty čakal.
+
+**Termostat visí presne v tej izbe, ktorú najviac prehrieva slnko.** Na slnečný
+zimný deň sa obývačka sama vyhreje, termostat vyhodnotí, že teplo netreba, a
+**zastaví kotol — hoci v spálni je v tej chvíli zima.**
+
+Riešenie je nastaviť to tak, aby termostat bol skôr poistka než hlavný regulátor:
+daj naň **o pol stupňa až stupeň viac**, než naozaj chceš (teda 22,5–23 °C namiesto
+22 °C), a nech teplotu v jednotlivých izbách riešia hlavice. Kotol potom drží
+teplotu vody podľa krivky, obývačka sa o seba postará sama a spálňa neostane bez
+tepla zakaždým, keď vysvitne slnko. Na veľmi slnečné dni pomôžu aj stiahnuté žalúzie
+v obývačke.
+
 ## 4. Termostatické hlavice
 
 Zlaté pravidlo: **v obývačke, kde visí termostat, nech je hlavica naplno otvorená.**
@@ -69,9 +99,9 @@ termostat to vyhodnotí ako málo tepla a nechá kotol bežať dlhšie.
 | Izba | Odporúčanie |
 |---|---|
 | D — obývačka (referenčná, je tu termostat) | **hlavica naplno otvorená** |
-| C — detská 21,5 °C | približne poloha 3,5 |
+| C — detská 21,5 °C | približne poloha 3,4 |
 | A — kuchyňa 21 °C | približne poloha 3,2 (kuchyňa má zisky od varenia) |
-| B — spálňa 19 °C | približne poloha 2,7 |
+| B — spálňa 20 °C | približne poloha 3 — a pokojne viac, je to najchladnejšia izba |
 
 Čísla na hlaviciach sú orientačné a líšia sa podľa výrobcu (zvyčajne 1 ≈ 12 °C,
 3 ≈ 20 °C, 5 ≈ 28 °C). Appka ich prepočíta v záložke Izby.

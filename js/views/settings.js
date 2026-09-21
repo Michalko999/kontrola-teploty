@@ -68,7 +68,7 @@ export function render(ctx) {
       ],
       onChange: (v) => {
         state.building.type = v;
-        state.building.massHours = v === 'tehla' ? 18 : v === 'novostavba' ? 10 : 12;
+        state.building.massHours = v === 'tehla' ? 18 : v === 'novostavba' ? 10 : 15;
         save(); rerender();
       },
     }), 'Nastaví zotrvačnosť — ako dlho budova drží teplo.'),
