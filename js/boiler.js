@@ -12,7 +12,6 @@ import { computeFlow, condensingInfo, cyclingRisk, curveSlope } from './equither
 /** Profil konkretneho kotla zo stitka na fotke. */
 export const VICTRIX_TERA_28 = {
   model: 'Immergas Victrix Tera 28 1',
-  serial: '1002085907',
   minKw: 4.3,
   maxHeatingKw: 24.1,
   maxDhwKw: 28.1,

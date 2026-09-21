@@ -6,13 +6,22 @@ Netreba Google Play ani App Store.
 
 ## Možnosť A — GitHub Pages (najrýchlejšie)
 
-1. V repozitári na GitHube: **Settings → Pages**
-2. *Source*: `Deploy from a branch`, vetva `claude/mobile-equithermic-app-7za8ii`, priečinok `/ (root)`
-3. Po chvíli dostaneš adresu `https://<účet>.github.io/kontrola-teploty/`
-4. Otvor ju v telefóne a pridaj na plochu (návod nižšie)
+> **Repozitár musí byť verejný.** Na bezplatnom pláne GitHub neumožňuje Pages
+> pre súkromné repozitáre (vyžaduje Pro/Enterprise). Preto v kóde nie sú žiadne
+> osobné údaje — sériové číslo kotla je zámerne odstránené.
+
+1. **Settings → General → Danger Zone → Change repository visibility → Public**
+2. **Settings → Pages**
+3. *Source*: `Deploy from a branch`, vetva `claude/mobile-equithermic-app-7za8ii`,
+   priečinok `/ (root)`, **Save**
+4. O 1–2 minúty beží na `https://michalko999.github.io/kontrola-teploty/`
+5. Otvor ju v telefóne a pridaj na plochu (návod nižšie)
+
+Súbor `.nojekyll` v koreni je dôležitý — bez neho by GitHub hnal stránku cez
+generátor Jekyll a časť súborov by nenasadil.
 
 > Pozor: cez https nebude appka vedieť čítať WiFi senzory v domácej sieti.
-> Pozri `docs/wifi-senzory.md`.
+> Pozri `docs/wifi-senzory.md`. Ak ich raz kúpiš, používaj doma možnosť B.
 
 ## Možnosť B — z vlastnej siete (funguje aj so senzormi)
 

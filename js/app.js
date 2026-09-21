@@ -122,7 +122,7 @@ function renderMore(c) {
 
   wrap.append(card(null, button('Návod ku kotlu a k hlaviciam', {
     variant: 'ghost',
-    onClick: () => window.open('docs/navod-nastavenie-kotla.md', '_blank'),
+    onClick: () => window.open('https://github.com/Michalko999/kontrola-teploty/blob/HEAD/docs/navod-nastavenie-kotla.md', '_blank'),
   })));
   return wrap;
 }
