@@ -1,6 +1,6 @@
 /* Service worker — appka funguje aj bez signalu (offline-first pre vlastne subory). */
 
-const CACHE = 'ekvitermika-v4';
+const CACHE = 'ekvitermika-v5';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './css/styles.css',
   './assets/icon.svg',
