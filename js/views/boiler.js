@@ -42,11 +42,14 @@ export function render(ctx) {
       onChange: (v) => { state.boiler.hasOpenTherm = v === 'null' ? null : v === 'true'; save(); rerender(); },
     }), 'Over v návode — rozhoduje o tom, či sa dá kotol raz riadiť automaticky.')));
 
+  // Hodnoty su cele vety, nie kratke cisla — v dvoch stlpcoch by na telefone
+  // rozdrvili nazov a vytiekli mimo obrazovku. Preto kazda polozka ako blok.
   wrap.append(card('Odporúčané nastavenie',
-    el('table', { class: 'check' },
-      el('tbody', {}, checklist(state).map((c) => el('tr', {},
-        el('td', {}, el('strong', {}, c.item), el('small', {}, c.why)),
-        el('td', { class: 'check-val' }, c.value)))))));
+    el('ul', { class: 'check' },
+      checklist(state, ev.result.heatingNeeded ? ev.result.flow : null).map((c) => el('li', {},
+        el('div', { class: 'check-item' }, c.item),
+        el('div', { class: 'check-val' }, c.value),
+        el('small', {}, c.why))))));
 
   wrap.append(card('Dôležité upozornenie',
     el('p', { class: 'hint' },

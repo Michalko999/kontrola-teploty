@@ -196,10 +196,14 @@ th { text-align: left; font-size: 12px; color: var(--text-dim); text-transform: 
 td { padding: 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
 .curve-table td { font-variant-numeric: tabular-nums; }
 .curve-table tr.off td { color: var(--text-dim); }
-.plan td:last-child { text-align: right; }
-.check td { padding: 9px 0; }
-.check td small { display: block; color: var(--text-dim); font-size: 12px; margin-top: 2px; line-height: 1.4; }
-.check-val { text-align: right; white-space: nowrap; font-weight: 600; padding-left: 10px; }
+/* tabulka najblizsich dni — pozor, .plan je SVG podorys, nie tato tabulka */
+.dayplan td:last-child { text-align: right; }
+.check { list-style: none; margin: 0; padding: 0; }
+.check li { padding: 10px 0; border-top: 1px solid var(--line); }
+.check li:first-child { border-top: 0; padding-top: 0; }
+.check small { display: block; color: var(--text-dim); font-size: 12px; margin-top: 4px; line-height: 1.45; }
+.check-item { font-size: 14px; font-weight: 600; }
+.check-val { font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 2px; }
 .spec { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .spec-item dt { font-size: 12px; color: var(--text-dim); }
 .spec-item dd { margin: 0; font-weight: 600; font-size: 15px; }

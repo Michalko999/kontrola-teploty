@@ -101,7 +101,7 @@ export function render(ctx) {
   const days = plan(state, weather, 3);
   if (days.length) {
     wrap.append(card('Najbližšie dni',
-      el('table', { class: 'plan' },
+      el('table', { class: 'dayplan' },
         el('thead', {}, el('tr', {},
           el('th', {}, 'Deň'), el('th', {}, 'Vonku'), el('th', {}, 'Nastav'))),
         el('tbody', {}, days.map((d) => el('tr', {},

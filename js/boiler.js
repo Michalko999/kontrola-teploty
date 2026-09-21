@@ -130,7 +130,10 @@ function suggestPowerPercent(cyc) {
 }
 
 /** Kontrolny zoznam nastaveni kotla, ktory appka odporuca pre tento byt. */
-export function checklist(state) {
+/** @param {object} state
+ *  @param {number|null} [flowNow] teplota, ktoru appka odporuca prave teraz.
+ *         Bez nej by hodnota zavisela od toho, ci sa predtym vykreslil Prehlad. */
+export function checklist(state, flowNow = null) {
   const { boiler, curve, building } = state;
   const slope = curveSlope({
     tIndoorDesign: building.tIndoorDesign,
@@ -140,7 +143,7 @@ export function checklist(state) {
   return [
     {
       item: 'Teplota vykurovacej vody (kúrenie)',
-      value: `podľa appky, dnes ${state.settings.lastFlow ?? '—'} °C`,
+      value: flowNow == null ? 'podľa appky — pozri Prehľad' : `podľa appky teraz ${flowNow} °C`,
       why: 'Toto je jediné, čo treba meniť pri zmene počasia — appka ti povie číslo.',
     },
     {
@@ -160,7 +163,7 @@ export function checklist(state) {
     },
     {
       item: 'Čerpadlo',
-      value: 'režim s premenlivými otáčkami / doběh po vypnutí horáka',
+      value: 'premenlivé otáčky, s dobehom po vypnutí horáka',
       why: 'Rozvedie zvyškové teplo a zníži taktovanie.',
     },
     {
