@@ -7,7 +7,7 @@
 const KEY = 'ekvitermika.v1';
 
 /** Vychodzie nastavenie postavene na podklade od uzivatela: byt 4 izby + chodba,
- *  Immergas Victrix Tera 28 1, termostat presuvany do chodby pri obyvacke. */
+ *  Immergas Victrix Tera 28 1, termostat na stene obyvacky (izba D). */
 export const DEFAULTS = {
   version: 1,
 
@@ -51,16 +51,18 @@ export const DEFAULTS = {
     nightTo: '05:30',
   },
 
-  /** Termostat: cerveny bod v nakrese = stena chodby pri obyvacke (D).
-   *  Chodba nema vlastny radiator, preto je tam chladnejsie ako v referencnej
-   *  izbe — offset to kompenzuje. */
+  /** Termostat je na stene medzi obyvackou a chodbou, ale zo strany OBYVACKY
+   *  (izba D) — teda priamo v referencnej izbe. To je podstatne lepsia poloha
+   *  nez chodba: meria vzduch tam, kde sa naozaj zdrziavate, a nie je za dverami.
+   *  Offset preto ostava 0 a sluzi uz len na kalibraciu, ak by termostat ukazoval
+   *  inak nez skutocnost. */
   thermostat: {
-    placement: 'chodba',                 // chodba | D | A | B | C
-    placementNote: 'Nové miesto (červená značka) — stena chodby pri obývačke, bez vlastného radiátora.',
+    placement: 'D',                      // D | A | B | C | chodba
+    placementNote: 'Stena medzi obývačkou a chodbou, zo strany obývačky — teda priamo v referenčnej izbe.',
     referenceRoom: 'D',
-    offset: -1.0,                        // o kolko je na termostate chladnejsie ako v referencnej izbe
+    offset: 0,                           // kalibracia: o kolko termostat ukazuje inak nez je v izbe
     offsetMeasuredAt: null,
-    setpointDay: 21.5,
+    setpointDay: 22.0,                   // drzane v sulade s cielovou teplotou izby D
     setpointNight: 19.0,
   },
 
@@ -80,10 +82,10 @@ export const DEFAULTS = {
       note: 'Najteplejšia izba, hlavica najvyššie.' },
     { id: 'D', name: 'Obývačka', target: 22.0, hasTrv: true,  hasRadiator: true,
       wall: 'západ', extDoor: 'balkónové dvere', sensorId: null,
-      note: 'Referenčná izba — hlavicu nechaj naplno otvorenú (poloha 5 / snímka).' },
+      note: 'Referenčná izba — je tu termostat, preto hlavicu nechaj naplno otvorenú.' },
     { id: 'H', name: 'Chodba',   target: 20.0, hasTrv: false, hasRadiator: false,
       wall: null, extDoor: 'vchodové dvere', sensorId: null,
-      note: 'Bez radiátora, tu je termostat. Vykuruje sa otvorenými dverami z izieb.' },
+      note: 'Bez radiátora — vykuruje sa otvorenými dverami z izieb.' },
   ],
 
   sensors: [],      // WiFi teplomery — viz sensors.js

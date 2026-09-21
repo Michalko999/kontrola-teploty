@@ -24,11 +24,13 @@ export function render(ctx) {
 
   wrap.append(card('Pôdorys', floorPlan((id) => { ctx.go('rooms', id); }, selected),
     el('p', { class: 'hint' },
-      'Ťukni na izbu a nastav jej teplotu. Červená značka = nové miesto termostatu v chodbe.')));
+      'Ťukni na izbu a nastav jej teplotu. Červená značka = termostat na stene obývačky.')));
 
   // ---- termostat ----------------------------------------------------------
   const ref = room(state.thermostat.referenceRoom);
-  wrap.append(card('Termostat v chodbe',
+  const at = room(state.thermostat.placement);
+  const inRefRoom = state.thermostat.placement === state.thermostat.referenceRoom;
+  wrap.append(card(at ? `Termostat v izbe ${at.name}` : 'Termostat v chodbe',
     el('p', { class: 'hint' }, state.thermostat.placementNote),
     row('Referenčná izba', select({
       value: state.thermostat.referenceRoom,
@@ -37,17 +39,21 @@ export function render(ctx) {
     }), 'Izba, ktorej teplotu chceš v skutočnosti riadiť.'),
     row('Chcem v referenčnej izbe', numberField({
       value: state.thermostat.setpointDay, min: 16, max: 26, step: 0.5, suffix: '°C',
-      onChange: (v) => { state.thermostat.setpointDay = v; save(); rerender(); },
-    })),
-    row('Rozdiel chodba − izba', slider({
+      onChange: (v) => { setReferenceTarget(v); rerender(); },
+    }), ref ? `To isté ako cieľová teplota izby ${ref.name} — mení sa spolu.` : null),
+    row('Kalibrácia termostatu', slider({
       value: state.thermostat.offset, min: -4, max: 2, step: 0.1,
       format: (v) => `${v > 0 ? '+' : ''}${v.toFixed(1)} K`,
       onInput: (v) => { state.thermostat.offset = Math.round(v * 10) / 10; save(); rerender(); },
-    }), 'Chodba nemá radiátor, býva v nej chladnejšie.'),
+    }), inRefRoom
+      ? 'Nechaj 0, pokiaľ termostat neukazuje inak než skutočná teplota v izbe.'
+      : 'O koľko je tam, kde termostat visí, chladnejšie než v referenčnej izbe.'),
     el('div', { class: 'setpoint-box' },
       el('div', {}, 'Na termostate nastav'),
       el('strong', {}, `${round1(state.thermostat.setpointDay + state.thermostat.offset)} °C`),
-      el('small', {}, `aby bolo v izbe ${ref?.name || '—'} ${state.thermostat.setpointDay} °C`)),
+      el('small', {}, state.thermostat.offset === 0
+        ? `termostat je priamo v izbe ${ref?.name || '—'}, takže bez prepočtu`
+        : `aby bolo v izbe ${ref?.name || '—'} ${state.thermostat.setpointDay} °C`)),
     offsetHelper(rerender),
     row('Nočná teplota', numberField({
       value: state.thermostat.setpointNight, min: 14, max: 24, step: 0.5, suffix: '°C',
@@ -85,8 +91,12 @@ function roomCard(r, isOpen, ctx) {
   const body = el('div', { class: 'room-body' },
     row('Požadovaná teplota', numberField({
       value: r.target, min: 14, max: 26, step: 0.5, suffix: '°C',
-      onChange: (v) => { r.target = v; save(); ctx.rerender(); },
-    })),
+      onChange: (v) => {
+        if (isRef) setReferenceTarget(v);      // termostat meria túto izbu
+        else { r.target = v; save(); }
+        ctx.rerender();
+      },
+    }), isRef ? 'Túto teplotu drží termostat — mení sa spolu s jeho nastavením.' : null),
     r.hasTrv
       ? row('Poloha hlavice', el('strong', {}, isRef ? 'naplno otvorená' : trvPosition(r.target)),
           isRef ? 'Referenčná izba — riadi ju termostat.' : 'Orientačne, stupnice sa líšia podľa výrobcu.')
@@ -123,15 +133,16 @@ function sensorPicker(r, ctx) {
 
 function offsetHelper(rerender) {
   let tHall = '', tRoom = '';
-  const inputHall = el('input', { type: 'number', inputmode: 'decimal', step: '0.1', placeholder: 'chodba',
+  const inputHall = el('input', { type: 'number', inputmode: 'decimal', step: '0.1', placeholder: 'termostat',
     oninput: (e) => { tHall = e.target.value; } });
-  const inputRoom = el('input', { type: 'number', inputmode: 'decimal', step: '0.1', placeholder: 'izba',
+  const inputRoom = el('input', { type: 'number', inputmode: 'decimal', step: '0.1', placeholder: 'teplomer',
     oninput: (e) => { tRoom = e.target.value; } });
 
   return el('details', { class: 'helper' },
-    el('summary', {}, 'Zmerať rozdiel presne'),
+    el('summary', {}, 'Skontrolovať, či termostat ukazuje správne'),
     el('p', { class: 'hint' },
-      'Polož teplomer na chvíľu k termostatu a potom do referenčnej izby (obe merania v rovnakom čase dňa, dvere ako obvykle).'),
+      'Polož presný teplomer vedľa termostatu a odčítaj obe hodnoty naraz: čo ukazuje termostat a čo teplomer. '
+      + 'Rozdiel je kalibrácia.'),
     el('div', { class: 'inline' }, inputHall, inputRoom,
       button('Spočítať', {
         onClick: () => {
@@ -200,13 +211,22 @@ export function floorPlan(onPick, selected) {
   door(240, 218, 28, 'balkón', 254, 234);
   door(158, 218, 24, 'vchod', 170, 234);
 
-  // termostat — cervena znacka na stene chodby pri obyvacke
-  svg.appendChild(mk('rect', { x: 146, y: 158, width: 8, height: 24, rx: 4, class: 'plan-thermo' }));
-  const tl = mk('text', { x: 140, y: 152, class: 'plan-note thermo', 'text-anchor': 'end' });
+  // termostat — cervena znacka na stene obyvacky (zo strany izby D, nie chodby)
+  svg.appendChild(mk('rect', { x: 140, y: 158, width: 8, height: 24, rx: 4, class: 'plan-thermo' }));
+  const tl = mk('text', { x: 134, y: 152, class: 'plan-note thermo', 'text-anchor': 'end' });
   tl.textContent = 'termostat';
   svg.appendChild(tl);
 
   return svg;
+}
+
+/** Termostat meria izbu, v ktorej visi — jej cielova teplota a setpoint
+ *  termostatu su ta ista vec, preto sa menia spolu. */
+function setReferenceTarget(v) {
+  state.thermostat.setpointDay = v;
+  const r = room(state.thermostat.referenceRoom);
+  if (r) r.target = v;
+  save();
 }
 
 const round1 = (v) => Math.round(v * 10) / 10;

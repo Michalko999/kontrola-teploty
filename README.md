@@ -5,7 +5,7 @@ podľa aktuálneho počasia — aj keď kotol nemá vonkajšie čidlo.
 
 Postavené na mieru pre: **Immergas Victrix Tera 28 1**, byt so štyrmi izbami
 (A kuchyňa, B spálňa, C detská, D obývačka) a chodbou, termostatické hlavice
-na radiátoroch, termostat na stene chodby pri obývačke.
+na radiátoroch, termostat na stene obývačky.
 
 ---
 
@@ -22,7 +22,7 @@ spočíta ekvitermickú krivku a povie konkrétne číslo, ktoré máš navoliť
 |---|---|
 | **Prehľad** | veľké číslo „nastav na kotli X °C“, stav kondenzácie, riziko taktovania, plán na 3 dni |
 | **Krivka** | graf, dve jednoduché páky (posun a strmosť), detailné parametre, tabuľka na vytlačenie |
-| **Izby** | interaktívny pôdorys podľa nákresu, polohy termostatických hlavíc, výpočet offsetu termostatu v chodbe |
+| **Izby** | interaktívny pôdorys podľa nákresu, polohy termostatických hlavíc, kalibrácia termostatu |
 | **Kotol** | údaje zo štítka, kontrolný zoznam nastavení, cesty k automatizácii |
 | **Senzory** | príprava na WiFi teplomery (Shelly, Home Assistant, ľubovoľné HTTP/JSON) |
 | **Denník** | história nastavení a hodnotení, podklad pre učenie krivky |
@@ -33,10 +33,11 @@ v rôznom počasí appka rozlíši, či treba **posunúť celú krivku** (chyba 
 alebo **zmeniť jej strmosť** (zima je len v mraze) — a navrhne úpravu aj s vysvetlením.
 Zmenu vždy potvrdzuješ ty.
 
-### Termostat v chodbe
-Chodba nemá vlastný radiátor, takže je v nej chladnejšie ako v obývačke. Appka s tým
-počíta: zmeriaš rozdiel a ona prepočíta, koľko naozaj navoliť na termostate, aby bolo
-v obývačke toľko, koľko chceš.
+### Termostat v obývačke
+Termostat je priamo v referenčnej izbe, takže žiadny prepočet netreba — čo chceš
+v obývačke, to nastavíš na termostate. Kalibrácia slúži len na prípad, že by
+termostat ukazoval inak než skutočnosť. Dôležité je nechať hlavicu na radiátore
+v obývačke naplno otvorenú, aby si termostat a hlavica neprekážali.
 
 ## Čo appka nerobí
 

@@ -108,13 +108,16 @@ export function advise({ state, tOutdoor, result }) {
     });
   }
 
-  // 5) termostat v chodbe bez radiatora
-  if (thermostat.placement === 'chodba' && thermostat.offset !== 0) {
+  // 5) termostat — dorovnanie, len ked naozaj ukazuje inak nez je v izbe
+  if (thermostat.offset !== 0) {
     const set = Math.round((thermostat.setpointDay + thermostat.offset) * 10) / 10;
+    const where = thermostat.placement === thermostat.referenceRoom
+      ? 'termostat ukazuje'
+      : 'tam, kde termostat visí, býva';
     out.push({
       level: 'tip',
       title: `Na termostate nastav ${set} °C`,
-      text: `Chceš ${thermostat.setpointDay} °C v izbe ${thermostat.referenceRoom}, ale v chodbe (kde je termostat, bez vlastného radiátora) býva o ${Math.abs(thermostat.offset)} K ${thermostat.offset < 0 ? 'chladnejšie' : 'teplejšie'}.`,
+      text: `Chceš ${thermostat.setpointDay} °C v izbe ${thermostat.referenceRoom}, ale ${where} o ${Math.abs(thermostat.offset)} K ${thermostat.offset < 0 ? 'menej' : 'viac'}.`,
     });
   }
 

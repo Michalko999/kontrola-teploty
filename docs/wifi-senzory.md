@@ -23,9 +23,10 @@ z nameraných teplôt.
 - typ *Iné zariadenie*, zadáš URL a cestu k hodnote (napr. `temperature:0.tC`)
 
 ### Koľko kusov stačí
-**Dva.** Jeden do obývačky (referenčná izba) a jeden k termostatu v chodbe —
-z tejto dvojice si appka spočíta rozdiel sama a už ho nemusíš merať ručne.
-Ďalšie do detskej a spálne sú príjemný bonus.
+**Dva až tri.** Prvý do obývačky vedľa termostatu — overíš ním, či termostat
+neukazuje vedľa, a appka bude mať skutočnú teplotu referenčnej izby. Ďalšie do
+detskej a spálne ukážu, či tam hlavice držia, čo majú — to sú izby, o ktorých
+inak nevieš nič.
 
 ---
 
@@ -73,7 +74,8 @@ http:
 3. Pri učení krivky sa namiesto hrubého odhadu zo spätnej väzby použije
    **skutočná odchýlka** teploty referenčnej izby od požadovanej —
    výrazne presnejšie.
-4. Dvojica *chodba + referenčná izba* nahradí ručné meranie offsetu termostatu.
+4. Teplomer vedľa termostatu odhalí, či termostat ukazuje správne — appka
+   z toho nastaví kalibráciu sama.
 
 ---
 

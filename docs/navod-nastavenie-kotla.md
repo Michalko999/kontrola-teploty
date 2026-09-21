@@ -38,34 +38,37 @@ pre tvoju obec a povie ti číslo, ktoré máš navoliť na kotli.
 
 ---
 
-## 3. Termostat v chodbe — dôležité
+## 3. Termostat v obývačke — dôležité
 
-Podľa nákresu ide termostat na stenu chodby pri obývačke. **Chodba nemá vlastný
-radiátor.** To má dva dôsledky:
+Termostat je na stene medzi obývačkou a chodbou, **zo strany obývačky** (izba D).
+Je teda priamo v referenčnej izbe, čo je podstatne lepšie, než keby visel v chodbe:
+meria vzduch tam, kde sa naozaj zdržiavate, a nie je oddelený dverami.
 
-1. **V chodbe je chladnejšie ako v obývačke** — zvyčajne o 0,5 až 2 K. Ak na
-   termostate navolíš 22 °C, v obývačke bude 23 °C a viac. Preto má appka
-   políčko „Rozdiel chodba − izba“: zmeraj ho raz poriadne
-   (Izby → *Zmerať rozdiel presne*) a appka ti povie, koľko naozaj navoliť.
-2. **Chodba sa vykuruje len otvorenými dverami.** Keď zatvoríš dvere do izieb,
-   termostat začne merať vlastný mikrosvet a kúrenie sa rozhodí. Ak dvere bežne
-   zatvárate, treba rozdiel premerať v tomto stave.
+Prakticky to znamená:
 
-Alternatíva, ak to pôjde: dať termostat priamo do obývačky, na vnútornú stenu,
-do výšky ~1,5 m, mimo priameho slnka, mimo radiátora a mimo prievanu od
-balkónových dverí. Riadenie bude o dosť priamejšie.
-
----
+1. **Žiadny prepočet netreba.** Chceš v obývačke 22 °C → na termostate nastavíš 22 °C.
+   Políčko *Kalibrácia termostatu* nechaj na 0 a siahni naň, len ak zistíš, že
+   termostat ukazuje inak než presný teplomer položený vedľa neho.
+2. **Hlavica na radiátore v obývačke musí byť naplno otvorená.** Toto je teraz
+   najdôležitejšie pravidlo celej sústavy. Termostat aj hlavica by inak riadili
+   tú istú izbu proti sebe: hlavica priškrtí radiátor, termostat to vyhodnotí ako
+   málo tepla a nechá kotol zbytočne bežať.
+3. **Skontroluj, čo termostat „vidí".** Nemal by byť v priamom slnku, nad
+   radiátorom, za záclonou, ani v prievane od balkónových dverí. Ideálna výška
+   je okolo 1,5 m. Stena medzi obývačkou a chodbou je vnútorná, čiže z tejto
+   stránky je poloha dobrá.
+4. **Ostatné izby si riadia hlavice.** Obývačka určuje, kedy kotol kúri; kuchyňa,
+   spálňa a detská si z toho tepla uberú toľko, koľko im dovolí ich hlavica.
 
 ## 4. Termostatické hlavice
 
-Zlaté pravidlo: **v izbe, kde „velí“ termostat, nech je hlavica naplno otvorená.**
+Zlaté pravidlo: **v obývačke, kde visí termostat, nech je hlavica naplno otvorená.**
 Inak si hlavica a termostat navzájom prekážajú — hlavica priškrtí radiátor,
 termostat to vyhodnotí ako málo tepla a nechá kotol bežať dlhšie.
 
 | Izba | Odporúčanie |
 |---|---|
-| D — obývačka (referenčná) | hlavica naplno otvorená |
+| D — obývačka (referenčná, je tu termostat) | **hlavica naplno otvorená** |
 | C — detská 21,5 °C | približne poloha 3,5 |
 | A — kuchyňa 21 °C | približne poloha 3,2 (kuchyňa má zisky od varenia) |
 | B — spálňa 19 °C | približne poloha 2,7 |

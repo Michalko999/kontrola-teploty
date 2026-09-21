@@ -49,9 +49,23 @@ function readHash() {
   if (v && VIEWS[v]) { current = v; param = p || null; }
 }
 
+let rendering = false;
+
 function rerender() {
   const main = document.querySelector('main');
   if (!main) return;
+  // Prekreslenie odstrani prave editovane policko; jeho blur by vyvolal dalsie
+  // prekreslenie uprostred tohto. Jedno vnorene volanie staci zahodit.
+  if (rendering) return;
+  rendering = true;
+  try {
+    renderView(main);
+  } finally {
+    rendering = false;
+  }
+}
+
+function renderView(main) {
   const view = VIEWS[current];
   document.querySelector('.topbar-title').textContent = view.title;
   clear(main).append(view.render({ ...ctx, weather, param, rerender, go, refreshWeather }));

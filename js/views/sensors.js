@@ -34,8 +34,8 @@ export function render(ctx) {
         el('li', { class: 'tip lvl-info' }, el('strong', {}, 'Čokoľvek s HTTP/JSON'),
           el('p', {}, 'Ak zariadenie vie vrátiť JSON s teplotou, stačí zadať adresu a cestu k hodnote.'))),
       el('p', { class: 'hint' },
-        'Minimum: jeden teplomer do referenčnej izby (obývačka) a jeden k termostatu v chodbe — '
-        + 'z tej dvojice si appka spočíta rozdiel sama.')));
+        'Minimum: jeden teplomer do obývačky vedľa termostatu — appka si overí, či termostat '
+        + 'neukazuje vedľa. Ďalšie do detskej a spálne ukážu, či tam hlavice držia, čo majú.')));
   }
 
   wrap.append(card('Prečo senzor niekedy nejde načítať',

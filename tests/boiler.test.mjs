@@ -8,12 +8,12 @@ const state = {
             antiCycleMinutes: 3, hasOutdoorProbe: false, tFlowMaxAllowed: 85 },
   building: { tOutDesign: -11, tIndoorDesign: 20, heatLossKw: 5, heatingLimit: 16 },
   curve: { tFlowMin: 28, tFlowMax: 70, tFlowDesign: 55, tReturnDesign: 45 },
-  thermostat: { placement: 'chodba', offset: -1, setpointDay: 21.5, referenceRoom: 'D' },
+  thermostat: { placement: 'D', offset: 0, setpointDay: 22, referenceRoom: 'D' },
   settings: {},
 };
 
 const flowAt = (tOutdoor) => computeFlow({
-  tIndoor: 21.5, tOutdoor, tOutdoorDesign: -11, tFlowDesign: 55, tReturnDesign: 45,
+  tIndoor: 22, tOutdoor, tOutdoorDesign: -11, tFlowDesign: 55, tReturnDesign: 45,
   exponent: 1.3, shift: 0, tFlowMin: 28, tFlowMax: 70, heatingLimit: 16,
 });
 
@@ -37,11 +37,18 @@ test('pri miernom pocasi varuje pred taktovanim predimenzovaneho kotla', () => {
   assert.match(tips.map((t) => t.title).join(' | '), /taktovani|taktovania/);
 });
 
-test('radi prepocitanu hodnotu na termostat kvoli chodbe bez radiatora', () => {
-  const tip = advise({ state, tOutdoor: -8, result: flowAt(-8) })
+test('termostat priamo v referencnej izbe nepotrebuje ziadny prepocet', () => {
+  const tips = advise({ state, tOutdoor: -8, result: flowAt(-8) });
+  assert.equal(tips.find((t) => t.title.includes('termostate')), undefined,
+    'pri nulovej kalibracii nema appka radit prepocet');
+});
+
+test('ked termostat ukazuje vedla, appka dorovna nastavenie', () => {
+  const miscalibrated = { ...state, thermostat: { ...state.thermostat, offset: -1.5 } };
+  const tip = advise({ state: miscalibrated, tOutdoor: -8, result: flowAt(-8) })
     .find((t) => t.title.includes('termostate'));
   assert.ok(tip, 'chyba rada pre termostat');
-  assert.match(tip.title, /20\.5 °C/);   // 21,5 pozadovanych - 1 K rozdiel chodby
+  assert.match(tip.title, /20\.5 °C/);   // 22 pozadovanych - 1,5 K kalibracie
 });
 
 test('kontrolny zoznam spomina chybajucu vonkajsiu sondu', () => {

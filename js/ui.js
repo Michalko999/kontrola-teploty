@@ -105,4 +105,10 @@ export function fmtDay(dateStr) {
   return d.toLocaleDateString('sk-SK', { weekday: 'short', day: 'numeric', month: 'numeric' });
 }
 
-export function clear(node) { while (node.firstChild) node.firstChild.remove(); return node; }
+/** Vyprazdni prvok. replaceChildren() je atomicke — pri mazani po jednom dieti
+ *  sa stihne spustit blur prave odstranovaneho policka a prekreslenie sa zacykli. */
+export function clear(node) {
+  if (typeof node.replaceChildren === 'function') node.replaceChildren();
+  else while (node.firstChild) node.firstChild.remove();
+  return node;
+}
