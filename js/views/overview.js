@@ -1,6 +1,6 @@
 /** Prehlad — hlavna obrazovka: co nastavit na kotli prave teraz. */
 
-import { el, card, button, badge, toast, fmtTemp, fmtDay, fmtDateTime } from '../ui.js';
+import { el, card, button, badge, toast, fmtTemp, fmtDay, fmtDateTime, num } from '../ui.js';
 import { state, save, addLog } from '../store.js';
 import { evaluate, table, plan } from '../engine.js';
 import { advise } from '../boiler.js';
@@ -11,7 +11,6 @@ import { readAll } from '../sensors.js';
 export function render(ctx) {
   const { weather, refreshWeather, go } = ctx;
   const ev = evaluate(state, weather);
-  state.settings.lastFlow = ev.result.flow;
 
   const wrap = el('div', { class: 'view' });
 
@@ -19,7 +18,7 @@ export function render(ctx) {
   const w = weather?.current;
   wrap.append(card(null,
     el('div', { class: 'weather' },
-      el('div', { class: 'big-temp' }, w ? `${w.temp.toFixed(1)}°` : '—'),
+      el('div', { class: 'big-temp' }, w ? `${num(w.temp)}°` : '—'),
       el('div', { class: 'weather-meta' },
         el('div', { class: 'weather-place' }, state.building.location.name || 'Poloha nenastavená'),
         el('small', {}, weather
@@ -33,30 +32,31 @@ export function render(ctx) {
       : null));
 
   // ---- hlavne cislo ------------------------------------------------------
-  const diff = Math.round((ev.result.flow - state.boiler.currentFlowSet) * 10) / 10;
+  // Porovnavame cele stupne — kotol jemnejsie ani nastavit nejde.
+  const diff = (ev.flowSet ?? 0) - state.boiler.currentFlowSet;
   wrap.append(card(null,
     el('div', { class: 'headline' },
       el('div', { class: 'headline-label' }, ev.result.heatingNeeded ? 'Nastav na kotli' : 'Kúrenie netreba'),
       el('div', { class: 'headline-value' },
-        ev.result.heatingNeeded ? `${ev.result.flow}` : 'OFF',
+        ev.result.heatingNeeded ? `${ev.flowSet}` : 'OFF',
         ev.result.heatingNeeded ? el('span', { class: 'unit' }, '°C') : null),
       el('div', { class: 'headline-sub' },
         ev.result.heatingNeeded
           ? `teplota vykurovacej vody${ev.night ? ' · nočný útlm' : ''}`
-          : `vonku je ${ev.tOutdoor} °C, nad medzou ${state.building.heatingLimit} °C`)),
+          : `vonku je ${fmtTemp(ev.tOutdoor)}, nad medzou ${fmtTemp(state.building.heatingLimit)}`)),
     ev.result.heatingNeeded
       ? el('div', { class: 'headline-extra' },
-          badge(`spiatočka ~${ev.result.return} °C`, ev.condensing.ok ? 'ok' : 'warn'),
+          badge(`spiatočka ~${fmtTemp(ev.result.return)}`, ev.condensing.ok ? 'ok' : 'warn'),
           badge(`záťaž ${Math.round(ev.result.phi * 100)} %`, 'info'),
-          badge(`~${ev.cycling.demandKw} kW`, ev.cycling.level === 'vysoke' ? 'warn' : 'info'))
+          badge(`~${num(ev.cycling.demandKw)} kW`, ev.cycling.level === 'vysoke' ? 'warn' : 'info'))
       : null,
     Math.abs(diff) >= 0.5 && ev.result.heatingNeeded
       ? el('div', { class: 'action-strip' },
-          el('span', {}, `Na kotli máš ${state.boiler.currentFlowSet} °C`),
-          button(`Nastavil som ${ev.result.flow} °C`, {
+          el('span', {}, `Na kotli máš ${fmtTemp(state.boiler.currentFlowSet, 0)}`),
+          button(`Nastavil som ${ev.flowSet} °C`, {
             onClick: () => {
-              state.boiler.currentFlowSet = ev.result.flow;
-              addLog({ type: 'nastavenie', tOut: ev.tOutdoor, phi: ev.result.phi, flowSet: ev.result.flow });
+              state.boiler.currentFlowSet = ev.flowSet;
+              addLog({ type: 'nastavenie', tOut: ev.tOutdoor, phi: ev.result.phi, flowSet: ev.flowSet });
               save();
               toast('Zapísané do denníka 👍', 'ok');
             },
@@ -106,10 +106,10 @@ export function render(ctx) {
           el('th', {}, 'Deň'), el('th', {}, 'Vonku'), el('th', {}, 'Nastav'))),
         el('tbody', {}, days.map((d) => el('tr', {},
           el('td', {}, fmtDay(d.date)),
-          el('td', {}, `${d.min}° … ${d.max}°`),
-          el('td', {}, d.heating ? el('strong', {}, `${d.flow} °C`) : 'kúriť netreba'))))),
+          el('td', {}, `${num(d.min)}° … ${num(d.max)}°`),
+          el('td', {}, d.heating ? el('strong', {}, `${d.flowSet} °C`) : 'kúriť netreba'))))),
       el('p', { class: 'hint' }, 'Hodnota platí pre priemer dňa. Ak ide silný mráz, v najchladnejšej hodine by krivka chcela až '
-        + `${Math.max(...days.map((d) => d.flowCold))} °C — netreba prestavovať, termostat to dorovná.`)));
+        + `${Math.max(...days.map((d) => d.flowColdSet))} °C — netreba prestavovať, termostat to dorovná.`)));
 
     const fc = weather.forecast.slice(0, 48);
     wrap.append(card('Vonkajšia teplota (48 h)',

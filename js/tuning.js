@@ -11,6 +11,8 @@
  * (zima / trochu zima / akurat / teplo), prepocitanej na priblizne K.
  */
 
+import { num } from './format.js';
+
 const FEEDBACK_TO_K = {
   zima: -1.5,
   chladno: -0.7,
@@ -128,7 +130,7 @@ function clampAdj(v, max = 3) {
   return Math.max(-max, Math.min(max, v));
 }
 const round1 = (v) => Math.round(v * 10) / 10;
-const fmt = (v) => (Math.round(Math.abs(v) * 10) / 10).toFixed(1);
+const fmt = (v) => num(Math.abs(v));
 
 /** Mozno uz aplikovat dalsiu upravu? (necháva dom ustalit sa) */
 export function canTuneNow(state) {

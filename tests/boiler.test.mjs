@@ -48,7 +48,7 @@ test('ked termostat ukazuje vedla, appka dorovna nastavenie', () => {
   const tip = advise({ state: miscalibrated, tOutdoor: -8, result: flowAt(-8) })
     .find((t) => t.title.includes('termostate'));
   assert.ok(tip, 'chyba rada pre termostat');
-  assert.match(tip.title, /20\.5 °C/);   // 22 pozadovanych - 1,5 K kalibracie
+  assert.match(tip.title, /20,5 °C/);   // 22 pozadovanych - 1,5 K kalibracie
 });
 
 test('kontrolny zoznam spomina chybajucu vonkajsiu sondu', () => {

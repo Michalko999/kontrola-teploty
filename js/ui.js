@@ -88,8 +88,9 @@ export const clampVal = (v, min, max) => {
   return out;
 };
 
-export const fmtTemp = (v, digits = 1) =>
-  v === null || v === undefined || Number.isNaN(v) ? '—' : `${Number(v).toFixed(digits)} °C`;
+// Formatovanie cisel zije vo format.js, aby ho mohli pouzivat aj moduly bez DOM.
+export { num, signed } from './format.js';
+export { temp as fmtTemp } from './format.js';
 
 export function fmtDateTime(ts) {
   if (!ts) return '—';

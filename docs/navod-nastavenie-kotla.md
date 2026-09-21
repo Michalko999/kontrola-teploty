@@ -24,6 +24,10 @@ počíta kotol z vonkajšieho čidla.
 **Ty čidlo nemáš** — takže ho nahrádza aplikácia: vezme vonkajšiu teplotu z predpovede
 pre tvoju obec a povie ti číslo, ktoré máš navoliť na kotli.
 
+Kotol sa dá nastaviť len po **celých stupňoch**, takže appka ti vždy povie celé
+číslo. Vnútri si ale počíta s desatinami a pamätá si ich — keď doladí krivku
+o pol stupňa, prejaví sa to na kotli až vtedy, keď sa to nazbiera na celý stupeň.
+
 ---
 
 ## 2. Prvé spustenie (10 minút)

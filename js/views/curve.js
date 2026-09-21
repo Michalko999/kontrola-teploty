@@ -1,8 +1,8 @@
 /** Krivka — rucne doladenie a automaticke ucenie z dennika. */
 
-import { el, card, button, row, slider, numberField, badge, toast } from '../ui.js';
+import { el, card, button, row, slider, numberField, badge, toast, num, signed, fmtTemp } from '../ui.js';
 import { state, save } from '../store.js';
-import { table, evaluate } from '../engine.js';
+import { table, evaluate, boilerSetpoint } from '../engine.js';
 import { curveSlope, flowDesignFromSlope } from '../equitherm.js';
 import { curveChart } from '../chart.js';
 import { suggestAdjustment, canTuneNow } from '../tuning.js';
@@ -25,29 +25,29 @@ export function render(ctx) {
       el('span', { class: 'k flow' }, 'prívod'),
       el('span', { class: 'k ret' }, 'spiatočka'),
       el('span', { class: 'k now' }, 'teraz')),
-    el('p', { class: 'hint' }, `Strmosť krivky ≈ ${slope}. Pri ${state.building.tOutDesign} °C vonku dá krivka `
-      + `${state.curve.tFlowDesign} °C do radiátorov.`)));
+    el('p', { class: 'hint' }, `Strmosť krivky ≈ ${num(slope, 2)}. Pri ${fmtTemp(state.building.tOutDesign, 0)} vonku dá krivka `
+      + `${fmtTemp(state.curve.tFlowDesign, 0)} do radiátorov.`)));
 
   // ---- dve najdolezitejsie paky ------------------------------------------
   wrap.append(card('Dve páky, ktoré stačia',
     row('Posun krivky',
       slider({
         value: state.curve.shift, min: -10, max: 10, step: 0.5,
-        format: (v) => `${v > 0 ? '+' : ''}${v} K`,
+        format: (v) => `${signed(v)} K`,
         onInput: (v) => { state.curve.shift = v; save(); rerender(); },
       }),
       'Zdvihne či zníži celú krivku. Použi, keď je rovnako chladno v mraze aj na jeseň.'),
     row('Strmosť krivky',
       slider({
         value: state.curve.tFlowDesign, min: 35, max: 80, step: 1,
-        format: (v) => `${v} °C`,
+        format: (v) => fmtTemp(v, 0),
         onInput: (v) => {
           state.curve.tFlowDesign = v;
           if (state.curve.tReturnDesign > v - 3) state.curve.tReturnDesign = v - 10;
           save(); rerender();
         },
       }),
-      `Teplota prívodu pri ${state.building.tOutDesign} °C vonku. Použi, keď je zima len v mraze.`),
+      `Teplota prívodu pri ${fmtTemp(state.building.tOutDesign, 0)} vonku. Použi, keď je zima len v mraze.`),
     el('p', { class: 'hint' },
       'Pravidlo: meň vždy len jednu vec a počkaj aspoň pol dňa, kým sa byt ustáli.')));
 
@@ -59,13 +59,15 @@ export function render(ctx) {
     el('div', { class: 'sug-row' },
       badge(`${sug.samples} záznamov`, 'info'),
       badge(`spoľahlivosť: ${sug.confidence}`, sug.confidence === 'vysoka' ? 'ok' : 'info'),
-      sug.shiftDelta ? badge(`posun ${sug.shiftDelta > 0 ? '+' : ''}${sug.shiftDelta} K`, 'tip') : null,
-      sug.flowDesignDelta ? badge(`strmosť ${sug.flowDesignDelta > 0 ? '+' : ''}${sug.flowDesignDelta} K`, 'tip') : null),
+      sug.shiftDelta ? badge(`posun ${signed(sug.shiftDelta)} K`, 'tip') : null,
+      sug.flowDesignDelta ? badge(`strmosť ${signed(sug.flowDesignDelta)} K`, 'tip') : null),
     button(canTune ? 'Použiť návrh' : 'Počkaj, byt sa ešte ustaľuje', {
       disabled: !canTune || (!sug.shiftDelta && !sug.flowDesignDelta),
       onClick: () => {
-        state.curve.shift = round1(state.curve.shift + sug.shiftDelta);
-        state.curve.tFlowDesign = round1(state.curve.tFlowDesign + sug.flowDesignDelta);
+        // Posuvnik posunu ma krok 0,5 a strmosti 1 °C; kotol vie aj tak len cele
+        // stupne, takze navrh zarovnavame na to, co sa da naozaj nastavit.
+        state.curve.shift = Math.round((state.curve.shift + sug.shiftDelta) * 2) / 2;
+        state.curve.tFlowDesign = Math.round(state.curve.tFlowDesign + sug.flowDesignDelta);
         state.settings.lastTuneAt = Date.now();
         state.log.unshift({ ts: Date.now(), type: 'ladenie', note: sug.reason });
         save(); toast('Krivka upravená', 'ok'); rerender();
@@ -93,10 +95,10 @@ export function render(ctx) {
     row('Maximálny prívod', numberField({
       value: state.curve.tFlowMax, min: 40, max: state.boiler.tFlowMaxAllowed, step: 1, suffix: '°C',
       onChange: (v) => { state.curve.tFlowMax = v; save(); rerender(); },
-    }), `Kotol dovolí najviac ${state.boiler.tFlowMaxAllowed} °C.`),
+    }), `Kotol dovolí najviac ${fmtTemp(state.boiler.tFlowMaxAllowed, 0)}.`),
     row('Nočný útlm', slider({
       value: state.curve.nightShift, min: -12, max: 0, step: 1,
-      format: (v) => `${v} K`,
+      format: (v) => `${num(v, 0)} K`,
       onInput: (v) => { state.curve.nightShift = v; save(); rerender(); },
     }), `${state.curve.nightFrom} – ${state.curve.nightTo}. V paneláku nemá zmysel prehnaný útlm.`),
     row('Prepočet zo strmosti', el('div', { class: 'inline' },
@@ -117,11 +119,11 @@ export function render(ctx) {
     el('table', { class: 'curve-table' },
       el('thead', {}, el('tr', {}, el('th', {}, 'Vonku'), el('th', {}, 'Prívod'), el('th', {}, 'Spiatočka'))),
       el('tbody', {}, rows.map((r) => el('tr', { class: r.heatingNeeded ? '' : 'off' },
-        el('td', {}, `${r.tOutdoor} °C`),
-        el('td', {}, r.heatingNeeded ? `${r.flow} °C` : '—'),
-        el('td', {}, r.heatingNeeded ? `${r.return} °C` : '—')))))));
+        el('td', {}, fmtTemp(r.tOutdoor, 0)),
+        // Privod je cislo, ktore navolis na kotli — teda cele stupne.
+        el('td', {}, r.heatingNeeded ? `${boilerSetpoint(r.flow)} °C` : '—'),
+        el('td', {}, r.heatingNeeded ? fmtTemp(r.return) : '—')))))));
 
   return wrap;
 }
 
-const round1 = (v) => Math.round(v * 10) / 10;

@@ -8,6 +8,16 @@
  */
 
 import { computeFlow, condensingInfo, cyclingRisk, curveSlope } from './equitherm.js';
+import { num, temp as fmtTemp } from './format.js';
+
+/**
+ * Cislo, ktore sa da naozaj navolit na kotli.
+ *
+ * Victrix Tera ma na displeji len cele stupne, takze nema zmysel pytat
+ * 54,9 °C. Vypocet krivky aj jej ucenie vnutri pracuju s desatinami —
+ * zaokruhluje sa az tu, pri zobrazeni, aby sa chyba nehromadila.
+ */
+export const boilerSetpoint = (flow) => Math.round(flow);
 
 /** Profil konkretneho kotla zo stitka na fotke. */
 export const VICTRIX_TERA_28 = {
@@ -33,24 +43,27 @@ export function advise({ state, tOutdoor, result }) {
   const { boiler, building, curve, thermostat } = state;
 
   // 1) hlavna akcia — teplota vykurovacej vody
-  const diff = Math.round((result.flow - boiler.currentFlowSet) * 10) / 10;
+  // Kotol sa da prestavit len po celych stupnoch, takze aj rozdiel
+  // pocitame z toho, co sa da naozaj navolit.
+  const flowSet = boilerSetpoint(result.flow);
+  const diff = flowSet - boiler.currentFlowSet;
   if (!result.heatingNeeded) {
     out.push({
       level: 'info',
       title: 'Kúrenie netreba',
-      text: `Vonku je ${tOutdoor} °C, čo je nad medzou vykurovania (${building.heatingLimit} °C). Kotol môžeš prepnúť len na ohrev vody (režim leto).`,
+      text: `Vonku je ${fmtTemp(tOutdoor)}, čo je nad medzou vykurovania (${fmtTemp(building.heatingLimit, 0)}). Kotol môžeš prepnúť len na ohrev vody (režim leto).`,
     });
   } else if (Math.abs(diff) >= 2) {
     out.push({
       level: 'tip',
-      title: `Prestav teplotu vykurovacej vody na ${result.flow} °C`,
-      text: `Teraz máš nastavené ${boiler.currentFlowSet} °C, čo je o ${Math.abs(diff)} K ${diff > 0 ? 'málo' : 'veľa'}. Nastav sa otočným ovládačom/tlačidlami kúrenia na kotli.`,
+      title: `Prestav teplotu vykurovacej vody na ${flowSet} °C`,
+      text: `Teraz máš nastavené ${fmtTemp(boiler.currentFlowSet, 0)}, čo je o ${num(Math.abs(diff), 0)} K ${diff > 0 ? 'málo' : 'veľa'}. Nastav sa otočným ovládačom/tlačidlami kúrenia na kotli.`,
     });
   } else {
     out.push({
       level: 'info',
       title: 'Nastavenie kotla sedí',
-      text: `Vypočítaných ${result.flow} °C je prakticky to, čo máš nastavené (${boiler.currentFlowSet} °C). Nič neprestavuj.`,
+      text: `Vypočítaných ${flowSet} °C je prakticky to, čo máš nastavené (${fmtTemp(boiler.currentFlowSet, 0)}). Nič neprestavuj.`,
     });
   }
 
@@ -59,7 +72,7 @@ export function advise({ state, tOutdoor, result }) {
     out.push({
       level: 'info',
       title: 'Nastavenie sa oplatí skontrolovať pred sezónou',
-      text: `Keď vonku klesne pod ${building.heatingLimit} °C, appka ti povie konkrétnu teplotu vykurovacej vody. Dovtedy stačí mať kotol v režime ohrevu vody.`,
+      text: `Keď vonku klesne pod ${fmtTemp(building.heatingLimit, 0)}, appka ti povie konkrétnu teplotu vykurovacej vody. Dovtedy stačí mať kotol v režime ohrevu vody.`,
     });
     return out;
   }
@@ -68,7 +81,7 @@ export function advise({ state, tOutdoor, result }) {
   const cond = condensingInfo(result.return);
   out.push({
     level: cond.ok ? 'info' : 'warn',
-    title: `${cond.label} (spiatočka ~${result.return} °C)`,
+    title: `${cond.label} (spiatočka ~${fmtTemp(result.return)})`,
     text: cond.hint,
   });
 
@@ -82,13 +95,13 @@ export function advise({ state, tOutdoor, result }) {
     out.push({
       level: 'warn',
       title: 'Vysoké riziko taktovania kotla',
-      text: `Byt teraz potrebuje ~${cyc.demandKw} kW, ale kotol nevie ísť nižšie ako ${cyc.boilerMinKw} kW. V servisnom menu zníž maximálny výkon kúrenia (skús ~${suggestPowerPercent(cyc)} %) a predĺž oneskorenie opätovného zápalu (anti-cycle) na 5–10 minút. Pomôže aj otvorenie viacerých hlavíc naraz.`,
+      text: `Byt teraz potrebuje ~${num(cyc.demandKw)} kW, ale kotol nevie ísť nižšie ako ${num(cyc.boilerMinKw)} kW. V servisnom menu zníž maximálny výkon kúrenia (skús ~${suggestPowerPercent(cyc)} %) a predĺž oneskorenie opätovného zápalu (anti-cycle) na 5–10 minút. Pomôže aj otvorenie viacerých hlavíc naraz.`,
     });
   } else if (cyc.level === 'stredne') {
     out.push({
       level: 'tip',
       title: 'Kotol môže taktovať',
-      text: `Potreba ~${cyc.demandKw} kW vs. minimum kotla ${cyc.boilerMinKw} kW. Nechaj otvorené hlavice vo viacerých izbách, aby mal kotol kam teplo dávať.`,
+      text: `Potreba ~${num(cyc.demandKw)} kW vs. minimum kotla ${num(cyc.boilerMinKw)} kW. Nechaj otvorené hlavice vo viacerých izbách, aby mal kotol kam teplo dávať.`,
     });
   }
 
@@ -97,27 +110,27 @@ export function advise({ state, tOutdoor, result }) {
     out.push({
       level: 'info',
       title: 'Krivka je orezaná zdola',
-      text: `Výpočet dal menej ako minimum ${curve.tFlowMin} °C. Nižšie teploty už radiátory nestihnú odovzdať a kotol by len taktoval.`,
+      text: `Výpočet dal menej ako minimum ${fmtTemp(curve.tFlowMin, 0)}. Nižšie teploty už radiátory nestihnú odovzdať a kotol by len taktoval.`,
     });
   }
   if (result.clampedHigh) {
     out.push({
       level: 'warn',
       title: 'Krivka je orezaná zhora',
-      text: `Výpočet žiada viac ako ${curve.tFlowMax} °C. Ak je zima, zvýš strop v nastavení krivky — ale najprv skontroluj, či nie sú hlavice privreté a radiátory odvzdušnené.`,
+      text: `Výpočet žiada viac ako ${fmtTemp(curve.tFlowMax, 0)}. Ak je zima, zvýš strop v nastavení krivky — ale najprv skontroluj, či nie sú hlavice privreté a radiátory odvzdušnené.`,
     });
   }
 
   // 5) termostat — dorovnanie, len ked naozaj ukazuje inak nez je v izbe
   if (thermostat.offset !== 0) {
-    const set = Math.round((thermostat.setpointDay + thermostat.offset) * 10) / 10;
+    const set = num(thermostat.setpointDay + thermostat.offset);
     const where = thermostat.placement === thermostat.referenceRoom
       ? 'termostat ukazuje'
       : 'tam, kde termostat visí, býva';
     out.push({
       level: 'tip',
       title: `Na termostate nastav ${set} °C`,
-      text: `Chceš ${thermostat.setpointDay} °C v izbe ${thermostat.referenceRoom}, ale ${where} o ${Math.abs(thermostat.offset)} K ${thermostat.offset < 0 ? 'menej' : 'viac'}.`,
+      text: `Chceš ${fmtTemp(thermostat.setpointDay)} v izbe ${thermostat.referenceRoom}, ale ${where} o ${num(Math.abs(thermostat.offset))} K ${thermostat.offset < 0 ? 'menej' : 'viac'}.`,
     });
   }
 
@@ -143,7 +156,7 @@ export function checklist(state, flowNow = null) {
   return [
     {
       item: 'Teplota vykurovacej vody (kúrenie)',
-      value: flowNow == null ? 'podľa appky — pozri Prehľad' : `podľa appky teraz ${flowNow} °C`,
+      value: flowNow == null ? 'podľa appky — pozri Prehľad' : `podľa appky teraz ${num(flowNow, 0)} °C`,
       why: 'Toto je jediné, čo treba meniť pri zmene počasia — appka ti povie číslo.',
     },
     {
@@ -154,7 +167,7 @@ export function checklist(state, flowNow = null) {
     {
       item: 'Max. výkon kúrenia',
       value: `${boiler.maxHeatingPowerPercent} % (odporúčam znížiť, ak kotol taktuje)`,
-      why: `Byt má odhadom ${building.heatLossKw} kW stratu, kotol vie až ${boiler.maxHeatingKw} kW.`,
+      why: `Byt má odhadom ${num(building.heatLossKw)} kW stratu, kotol vie až ${num(boiler.maxHeatingKw)} kW.`,
     },
     {
       item: 'Oneskorenie opätovného zápalu (anti-cycle)',
@@ -168,10 +181,10 @@ export function checklist(state, flowNow = null) {
     },
     {
       item: 'Ekvitermická krivka v kotli',
-      value: boiler.hasOutdoorProbe ? `strmosť ~${slope}` : 'neaktívna (chýba vonkajšie čidlo)',
+      value: boiler.hasOutdoorProbe ? `strmosť ~${num(slope, 2)}` : 'neaktívna (chýba vonkajšie čidlo)',
       why: boiler.hasOutdoorProbe
         ? 'Kotol si teplotu dopočíta sám, appka slúži na kontrolu.'
-        : `Ak niekedy dokúpiš vonkajšiu sondu, nastav strmosť ~${slope} a appka bude už len kontrolná.`,
+        : `Ak niekedy dokúpiš vonkajšiu sondu, nastav strmosť ~${num(slope, 2)} a appka bude už len kontrolná.`,
     },
   ];
 }

@@ -1,6 +1,6 @@
 /** Izby — interaktivny podorys podla nakresu + nastavenie hlavic a termostatu. */
 
-import { el, card, button, row, numberField, slider, select, toast, fmtTemp } from '../ui.js';
+import { el, card, button, row, numberField, slider, select, toast, fmtTemp, num, signed } from '../ui.js';
 import { state, save, room } from '../store.js';
 import { computeThermostatOffset } from '../tuning.js';
 import { readSensor, friendlyError } from '../sensors.js';
@@ -43,17 +43,17 @@ export function render(ctx) {
     }), ref ? `To isté ako cieľová teplota izby ${ref.name} — mení sa spolu.` : null),
     row('Kalibrácia termostatu', slider({
       value: state.thermostat.offset, min: -4, max: 2, step: 0.1,
-      format: (v) => `${v > 0 ? '+' : ''}${v.toFixed(1)} K`,
+      format: (v) => `${signed(v)} K`,
       onInput: (v) => { state.thermostat.offset = Math.round(v * 10) / 10; save(); rerender(); },
     }), inRefRoom
       ? 'Nechaj 0, pokiaľ termostat neukazuje inak než skutočná teplota v izbe.'
       : 'O koľko je tam, kde termostat visí, chladnejšie než v referenčnej izbe.'),
     el('div', { class: 'setpoint-box' },
       el('div', {}, 'Na termostate nastav'),
-      el('strong', {}, `${round1(state.thermostat.setpointDay + state.thermostat.offset)} °C`),
+      el('strong', {}, fmtTemp(state.thermostat.setpointDay + state.thermostat.offset)),
       el('small', {}, state.thermostat.offset === 0
         ? `termostat je priamo v izbe ${ref?.name || '—'}, takže bez prepočtu`
-        : `aby bolo v izbe ${ref?.name || '—'} ${state.thermostat.setpointDay} °C`)),
+        : `aby bolo v izbe ${ref?.name || '—'} ${fmtTemp(state.thermostat.setpointDay)}`)),
     offsetHelper(rerender),
     row('Nočná teplota', numberField({
       value: state.thermostat.setpointNight, min: 14, max: 24, step: 0.5, suffix: '°C',
@@ -84,7 +84,7 @@ function roomCard(r, isOpen, ctx) {
   },
     el('span', { class: 'room-id' }, r.id),
     el('span', { class: 'room-name' }, r.name, isRef ? el('em', {}, ' · referenčná') : null),
-    el('span', { class: 'room-temp' }, `${r.target} °C`));
+    el('span', { class: 'room-temp' }, fmtTemp(r.target)));
 
   if (!isOpen) return el('div', { class: 'room' }, head);
 
@@ -177,7 +177,7 @@ export function floorPlan(onPick, selected) {
   for (const r of rooms) {
     const data = state.rooms.find((x) => x.id === r.id);
     const g = mk('g', { class: `plan-room ${selected === r.id ? 'sel' : ''}`, tabindex: '0', role: 'button',
-      'aria-label': `${data?.name || r.id}, ${data?.target} °C` });
+      'aria-label': `${data?.name || r.id}, ${num(data?.target)} °C` });
     g.appendChild(mk('rect', { x: r.x, y: r.y, width: r.w, height: r.h, rx: 2 }));
     const label = mk('text', { x: r.x + r.w / 2, y: r.y + r.h / 2 - 4, class: 'plan-id', 'text-anchor': 'middle' });
     label.textContent = r.id === 'H' ? '' : r.id;
@@ -187,7 +187,7 @@ export function floorPlan(onPick, selected) {
     if (r.id === 'H') { name.setAttribute('transform', `rotate(-90 ${r.x + r.w / 2} ${r.y + r.h / 2 + 12})`); }
     g.appendChild(name);
     const temp = mk('text', { x: r.x + r.w / 2, y: r.y + r.h / 2 + 27, class: 'plan-temp', 'text-anchor': 'middle' });
-    if (r.id !== 'H') temp.textContent = `${data?.target} °C`;
+    if (r.id !== 'H') temp.textContent = `${num(data?.target)} °C`;
     g.appendChild(temp);
     g.addEventListener('click', () => onPick(r.id));
     g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(r.id); } });
@@ -238,4 +238,3 @@ function setReferenceTarget(v) {
   save();
 }
 
-const round1 = (v) => Math.round(v * 10) / 10;

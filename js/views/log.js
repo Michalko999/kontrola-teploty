@@ -1,6 +1,6 @@
 /** Dennik — historia nastaveni a spatnej vazby. */
 
-import { el, card, button, badge, toast, fmtDateTime } from '../ui.js';
+import { el, card, button, badge, toast, fmtDateTime, fmtTemp } from '../ui.js';
 import { state, save } from '../store.js';
 import { FEEDBACK_OPTIONS } from '../tuning.js';
 import { lineChart } from '../chart.js';
@@ -64,8 +64,8 @@ function logItem(e, rerender) {
       el('small', {}, fmtDateTime(e.ts))),
     el('div', { class: 'log-body' },
       fb ? badge(`${fb.emoji} ${fb.label}`, 'tip') : null,
-      typeof e.tOut === 'number' ? badge(`vonku ${e.tOut} °C`, 'info') : null,
-      typeof e.flowSet === 'number' ? badge(`prívod ${e.flowSet} °C`, 'info') : null,
+      typeof e.tOut === 'number' ? badge(`vonku ${fmtTemp(e.tOut)}`, 'info') : null,
+      typeof e.flowSet === 'number' ? badge(`prívod ${fmtTemp(e.flowSet, 0)}`, 'info') : null,
       e.note ? el('span', { class: 'log-note' }, e.note) : null),
     el('button', {
       class: 'log-del', type: 'button', title: 'Zmazať záznam',

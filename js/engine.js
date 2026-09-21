@@ -2,6 +2,9 @@
 
 import { computeFlow, dampedOutdoor, curveTable, cyclingRisk, condensingInfo } from './equitherm.js';
 import { windCorrection } from './weather.js';
+import { boilerSetpoint } from './boiler.js';
+
+export { boilerSetpoint };
 
 /** Je teraz nocny utlm? */
 export function isNight(curve, date = new Date()) {
@@ -52,6 +55,7 @@ export function evaluate(state, weather) {
 
   return {
     night,
+    flowSet: result.heatingNeeded ? boilerSetpoint(result.flow) : null,
     tOutdoorRaw: raw,
     tOutdoorDamped: damped,
     windAdj,
@@ -95,7 +99,9 @@ export function plan(state, weather, days = 3) {
       min: Math.round(min * 10) / 10,
       max: Math.round(Math.max(...temps) * 10) / 10,
       flow: dayRes.flow,
+      flowSet: boilerSetpoint(dayRes.flow),
       flowCold: coldRes.flow,
+      flowColdSet: boilerSetpoint(coldRes.flow),
       heating: dayRes.heatingNeeded,
     };
   });

@@ -1,5 +1,7 @@
 /** chart.js — male SVG grafy bez externych kniznic (appka funguje aj offline). */
 
+import { num } from './format.js';
+
 const NS = 'http://www.w3.org/2000/svg';
 
 function svgEl(name, attrs = {}) {
@@ -69,7 +71,7 @@ export function curveChart({ rows, current, width = 320, height = 200 }) {
     const lbl = svgEl('text', {
       x: Math.min(cx + 8, width - pad.r - 30), y: Math.max(cy - 9, pad.t + 10), class: 'nowlabel',
     });
-    lbl.textContent = `${current.flow} °C`;
+    lbl.textContent = `${num(current.flow, 0)} °C`;
     svg.appendChild(lbl);
   }
   return svg;

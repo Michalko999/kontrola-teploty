@@ -1,6 +1,6 @@
 /** Kotol — co nastavit, preco, a co by sa dalo zautomatizovat. */
 
-import { el, card, row, numberField, toggle, select, button } from '../ui.js';
+import { el, card, row, numberField, toggle, select, button, num, fmtTemp } from '../ui.js';
 import { state, save } from '../store.js';
 import { VICTRIX_TERA_28, checklist } from '../boiler.js';
 import { evaluate } from '../engine.js';
@@ -12,10 +12,10 @@ export function render(ctx) {
 
   wrap.append(card(VICTRIX_TERA_28.model,
     el('dl', { class: 'spec' },
-      spec('Minimálny výkon', `${VICTRIX_TERA_28.minKw} kW`),
-      spec('Max. výkon kúrenie', `${VICTRIX_TERA_28.maxHeatingKw} kW`),
-      spec('Max. výkon TÚV', `${VICTRIX_TERA_28.maxDhwKw} kW`),
-      spec('Max. teplota vody', `${VICTRIX_TERA_28.tFlowMaxAllowed} °C`),
+      spec('Minimálny výkon', `${num(VICTRIX_TERA_28.minKw)} kW`),
+      spec('Max. výkon kúrenie', `${num(VICTRIX_TERA_28.maxHeatingKw)} kW`),
+      spec('Max. výkon TÚV', `${num(VICTRIX_TERA_28.maxDhwKw)} kW`),
+      spec('Max. teplota vody', fmtTemp(VICTRIX_TERA_28.tFlowMaxAllowed, 0)),
       spec('Typ', 'kondenzačný, kombinovaný')),
     el('ul', { class: 'tips' }, VICTRIX_TERA_28.notes.map((n) => el('li', { class: 'tip lvl-info' }, n)))));
 
@@ -23,7 +23,7 @@ export function render(ctx) {
     row('Teplota vykurovacej vody', numberField({
       value: state.boiler.currentFlowSet, min: 25, max: state.boiler.tFlowMaxAllowed, step: 1, suffix: '°C',
       onChange: (v) => { state.boiler.currentFlowSet = v; save(); rerender(); },
-    }), `Appka dnes odporúča ${ev.result.heatingNeeded ? ev.result.flow + ' °C' : 'kúrenie vypnúť'}.`),
+    }), `Appka teraz odporúča ${ev.result.heatingNeeded ? ev.flowSet + ' °C' : 'kúrenie vypnúť'}.`),
     row('Max. výkon kúrenia', numberField({
       value: state.boiler.maxHeatingPowerPercent, min: 30, max: 100, step: 5, suffix: '%',
       onChange: (v) => { state.boiler.maxHeatingPowerPercent = v; save(); rerender(); },
@@ -46,7 +46,7 @@ export function render(ctx) {
   // rozdrvili nazov a vytiekli mimo obrazovku. Preto kazda polozka ako blok.
   wrap.append(card('Odporúčané nastavenie',
     el('ul', { class: 'check' },
-      checklist(state, ev.result.heatingNeeded ? ev.result.flow : null).map((c) => el('li', {},
+      checklist(state, ev.flowSet).map((c) => el('li', {},
         el('div', { class: 'check-item' }, c.item),
         el('div', { class: 'check-val' }, c.value),
         el('small', {}, c.why))))));

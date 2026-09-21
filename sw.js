@@ -1,12 +1,12 @@
 /* Service worker — appka funguje aj bez signalu (offline-first pre vlastne subory). */
 
-const CACHE = 'ekvitermika-v5';
+const CACHE = 'ekvitermika-v6';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './css/styles.css',
   './assets/icon.svg',
   './js/app.js', './js/store.js', './js/ui.js', './js/chart.js',
   './js/engine.js', './js/equitherm.js', './js/weather.js', './js/boiler.js',
-  './js/sensors.js', './js/tuning.js',
+  './js/sensors.js', './js/tuning.js', './js/format.js',
   './js/views/overview.js', './js/views/curve.js', './js/views/rooms.js',
   './js/views/boiler.js', './js/views/sensors.js', './js/views/log.js', './js/views/settings.js',
 ];
