@@ -54,6 +54,16 @@ export function advise({ state, tOutdoor, result }) {
     });
   }
 
+  // Ked sa nekuri, rady o kondenzacii a taktovani nedavaju zmysel — kotol stoji.
+  if (!result.heatingNeeded) {
+    out.push({
+      level: 'info',
+      title: 'Nastavenie sa oplatí skontrolovať pred sezónou',
+      text: `Keď vonku klesne pod ${building.heatingLimit} °C, appka ti povie konkrétnu teplotu vykurovacej vody. Dovtedy stačí mať kotol v režime ohrevu vody.`,
+    });
+    return out;
+  }
+
   // 2) kondenzacia
   const cond = condensingInfo(result.return);
   out.push({
