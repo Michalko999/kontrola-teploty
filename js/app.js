@@ -169,7 +169,21 @@ function init() {
   });
 
   if ('serviceWorker' in navigator) {
+    // Ci uz nejaka verzia appku riadi. Pri uplne prvom otvoreni este ziadna nie je
+    // a clients.claim() by inak vyvolal zbytocne prekreslenie hned na uvod.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW:', e));
+
+    // Nova verzia sa stiahne na pozadi a vdaka skipWaiting() hned prevezme riadenie.
+    // Bez tohto by ju uzivatel uvidel az pri DRUHOM otvoreni appky — prve by este
+    // dobehlo na starom kode. Poistka "reloading" je proti zacykleniu.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloading || !hadController) return;
+      reloading = true;
+      location.reload();
+    });
   }
 }
 
